@@ -14,3 +14,10 @@ def products( request ):
   }
   return HttpResponse(template.render(context, request))
 
+def product( request, id):
+  product = Product.objects.get(id=id)
+  template = loader.get_template("individual_product.html")
+  context = {
+    'product': product
+  }
+  return HttpResponse(template.render(context, request))

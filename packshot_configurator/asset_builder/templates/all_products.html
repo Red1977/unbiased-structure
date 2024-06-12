@@ -5,11 +5,8 @@
 <h1>Products</h1>
   
 <ul>
-    <li>Static list item</li>
   {% for x in products %}
-    <li>"Hello"</li>
-    <li> {{x.thumbnail_path}}</li>
-    <img src={{ x.thumbnail_path }} alt="Product" width="500" height="600"><br>
+   <a href="individual_product/{{x.id }}"> <img src={{ x.thumbnail_path }} alt="Product" width="300" height="300"><br> </a>
   {% endfor %}
 </ul>
 
