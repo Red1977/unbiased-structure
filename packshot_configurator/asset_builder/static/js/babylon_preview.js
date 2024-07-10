@@ -322,6 +322,10 @@ var createScene = function () {
 
 };
 
+sayhello_button.addEventListener("click", function(){
+    alert("hello");
+});
+
 const scene = createScene(); //Call the createScene function
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
