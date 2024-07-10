@@ -1,13 +1,17 @@
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
+const sayhello_button = document.getElementById("sayhello_button");
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 var active_mesh = {};
 var all_meshes = [];
 let server = "https://red1977.github.io/urban-octo-robot/";
+const data = document.currentScript.dataset;
+const background_image = data.background_image;
+const glb_path = data.path_to_glb;
 
 class BackgroundMesh{
     constructor(mesh, scene){
         this.bg_material = new BABYLON.BackgroundMaterial("myMaterial", scene);
-        this.bg_material.diffuseTexture = new BABYLON.Texture(server+'/assets/pink_label_render.png', scene);
+        this.bg_material.diffuseTexture = new BABYLON.Texture(server+'/assets/'+background_image, scene);
         this.bg_material.diffuseTexture.vScale = -1.0;
         this.mesh = mesh;
         this.mesh.material = this.bg_material;
@@ -275,7 +279,10 @@ var createScene = function () {
     //Whole screen UI
     var guiTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI");
     
-    const container = BABYLON.SceneLoader.LoadAssetContainer(server+"/assets/", "pump_bottle_for_babylon_rear_proj_v03.glb", scene, function (container) {
+    console.log("glb_path:");
+    console.log(glb_path);
+
+    const container = BABYLON.SceneLoader.LoadAssetContainer(server + "/assets/" , glb_path, scene, function (container) {
 
             container.addAllToScene();
 
@@ -314,6 +321,7 @@ var createScene = function () {
     return scene;
 
 };
+
 const scene = createScene(); //Call the createScene function
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
