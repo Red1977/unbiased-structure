@@ -303,7 +303,10 @@ var createScene = function () {
             background_obj = new BackgroundMesh(background_plane, scene);
             label_obj = new LabelMesh(label1, 1024*(20/10), 1024, guiTexture, scene);
 
-            
+            sayhello_button.addEventListener("click", function(){
+                label_obj.highlight();
+            });
+
             var pipeline = new BABYLON.DefaultRenderingPipeline(
                 "defaultPipeline", // The name of the pipeline
                 true, // Do you want the pipeline to use HDR texture?
@@ -321,10 +324,6 @@ var createScene = function () {
     return scene;
 
 };
-
-sayhello_button.addEventListener("click", function(){
-    alert("hello");
-});
 
 const scene = createScene(); //Call the createScene function
 // Register a render loop to repeatedly render the scene
