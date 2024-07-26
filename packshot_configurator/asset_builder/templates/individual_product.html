@@ -56,10 +56,9 @@
                     {% csrf_token %}
                     {{ form.as_p }}
                     <button type="submit">Upload</button>
+                    <input type="hidden" id="texture_input"></input>
                 </form>
-                {% if file_url %}
-                    <p>File uploaded to: <a href="{{ file_url }}">{{ file_url }}</a></p>
-                {% endif %}
+                
 
                 <!-- debug 
                 <p>This is some text</p>
@@ -67,22 +66,30 @@
                 <p>.glb filename: {{ product.glb_filename }}</p>
                 <p>Path to blender scene: {{ product.blender_scene_path }}</p>2
                 <p>Size in ml: {{ product.size_ml }}</p>
+                <img id= "uploaded_image" src="{{ file_url }}">
                 <p>Thumbnail path: {{ product.thumbnail_path }}</p>-->
             </td>
         </tr>
     </table>
 
-
     <script type="text/javascript"  src="{% static 'js/babylon_preview.js' %}"
                                     defer
                                     data-path_to_glb="{{ product.glb_filename }}"
-                                    data-background_image="{{ product.background_image }}">
-
+                                    data-background_image="{{ product.background_image }}"
+                                    >
     </script>
 
-	
+    {% if file_url %}
+    <p>File uploaded to: <a href="{{ file_url }}">{{ file_url }}</a></p>
 
-	
+    <script type="text/javascript">
+    { 
+            document.getElementById("texture_input").value = "{{ file_url }}";
+            document.getElementById("texture_input").dispatchEvent(new Event("change"));
+        };
+    </script>
+
+    {% endif %}
    </body>
 
 </html>
