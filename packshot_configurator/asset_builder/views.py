@@ -34,6 +34,7 @@ def product( request, id):
         'form': form,
         'file_url': file_url
       }
+      
   else:
     form = UploadFileForm()
 
@@ -41,5 +42,5 @@ def product( request, id):
       'product': product,
       'form': form
     }
-    
+
   return HttpResponse(template.render(context, request))
