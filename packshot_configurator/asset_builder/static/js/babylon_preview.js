@@ -1,12 +1,18 @@
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const sayhello_button = document.getElementById("sayhello_button");
+const texture_input = document.getElementById("texture_input");
+if (texture_input.value != ""){
+    alert("inside babylonjs" +texture_input.value);
+}
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 var active_mesh = {};
 var all_meshes = [];
 let server = "https://red1977.github.io/urban-octo-robot/";
 const data = document.currentScript.dataset;
 const background_image = data.background_image;
+const label_image = data.label_image;
 const glb_path = data.path_to_glb;
+const texture_path = data.texture_image;
 
 class BackgroundMesh{
     constructor(mesh, scene){
@@ -104,7 +110,7 @@ class LabelMesh{
         var img = new Image();
         var image_name_text = this.image_name_text;
 
-        input.onchange = () => {
+        /*input.onchange = () => {
             const files = Array.from(input.files);
             const file = files[0];
 
@@ -116,7 +122,9 @@ class LabelMesh{
             reader.readAsDataURL(file);
             
         };
-        input.click();
+        input.click();*/
+
+        img.src = texture_input.value;
 
         var textureContext = this.target_texture.getContext();
         var textureGround = this.target_texture;
@@ -307,6 +315,10 @@ var createScene = function () {
                 label_obj.highlight();
             });
 
+            if (texture_input.value != ""){
+                label_obj.upload_image_to_texture();
+            }
+            
             var pipeline = new BABYLON.DefaultRenderingPipeline(
                 "defaultPipeline", // The name of the pipeline
                 true, // Do you want the pipeline to use HDR texture?
