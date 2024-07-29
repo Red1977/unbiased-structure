@@ -8,15 +8,25 @@
         <title>Babylon Template</title>
         <style>
             #renderCanvas {
-                width: 500px;
-                height: 500px;
+                width: 720px;
+                height: 720px;
                 touch-action: none;
             }
 
             th, td {
                 padding: 15px;
             }
+
+            h1 {
+                text-align: center;
+            }
+
+            .centre {
+                margin-left: auto;
+                margin-right: auto;
+            }
         </style>
+        
 
         <script src="https://cdn.babylonjs.com/babylon.js"></script> <!--TODO: REPLACE WITH PROPER CDN -->
         <script src="https://cdn.babylonjs.com/gui/babylon.gui.js"></script>
@@ -34,9 +44,9 @@
     </head>
 
    <body>
-    <h1>{{product.product_name}}</h1>
+    <h1 >{{product.product_name}}</h1>
 
-    <table >
+    <table  class="centre">
         <tr>
             <td>
                 <canvas id="renderCanvas"></canvas>
@@ -58,19 +68,25 @@
                     <button type="submit">Upload</button>
                     <input type="hidden" id="texture_input"></input>
                 </form>
-                
-
-                <!-- debug 
-                <p>This is some text</p>
-                
-                <p>.glb filename: {{ product.glb_filename }}</p>
-                <p>Path to blender scene: {{ product.blender_scene_path }}</p>2
-                <p>Size in ml: {{ product.size_ml }}</p>
-                <img id= "uploaded_image" src="{{ file_url }}">
-                <p>Thumbnail path: {{ product.thumbnail_path }}</p>-->
+                <div>
+                    <p></p>
+                    <p>Horizontal: </p>
+                    <input type="range" min="-50" max="50" value="0" id="tex_u">
+                    
+                </div>
             </td>
         </tr>
     </table>
+
+    {% if file_url %}
+
+        <script type="text/javascript">
+            { 
+                    document.getElementById("texture_input").value = "{{ file_url }}";
+            };
+        </script>
+
+    {% endif %}
 
     <script type="text/javascript"  src="{% static 'js/babylon_preview.js' %}"
                                     defer
@@ -78,18 +94,7 @@
                                     data-background_image="{{ product.background_image }}"
                                     >
     </script>
-
-    {% if file_url %}
-    <p>File uploaded to: <a href="{{ file_url }}">{{ file_url }}</a></p>
-
-    <script type="text/javascript">
-    { 
-            document.getElementById("texture_input").value = "{{ file_url }}";
-            document.getElementById("texture_input").dispatchEvent(new Event("change"));
-        };
-    </script>
-
-    {% endif %}
+    
    </body>
 
 </html>

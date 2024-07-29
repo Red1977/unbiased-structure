@@ -1,9 +1,8 @@
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const sayhello_button = document.getElementById("sayhello_button");
 const texture_input = document.getElementById("texture_input");
-if (texture_input.value != ""){
-    alert("inside babylonjs" +texture_input.value);
-}
+const texture_u = document.getElementById("tex_u");
+
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 var active_mesh = {};
 var all_meshes = [];
@@ -134,7 +133,7 @@ class LabelMesh{
         var left = this.left;
         var top = this.top;
 
-        var tex_u_slider = this.texture_u_slider;
+        var tex_u_slider = texture_u;
         var tex_v_slider = this.texture_v_slider;
         var size_slider = this.size_slider;
         
@@ -163,7 +162,7 @@ class LabelMesh{
         var textureContext = this.target_texture.getContext();
         textureContext.clearRect(0,0,this.canvas_width, this.canvas_height);
 
-        var left = this.left[0] + this.texture_u_slider.value;
+        var left = this.left[0] + (this.left[0] * (texture_u.value/100.0) );
         var top = this.top[0] + this.texture_v_slider.value;
 
         textureContext.drawImage(this.image,
@@ -180,9 +179,9 @@ class LabelMesh{
     }
     
     register_callbacks(){
-        this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, this.highlight ));
-        this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, this.remove_highlight));
-        this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, this.set_active_mesh));
+        //this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, this.highlight ));
+        //this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, this.remove_highlight));
+        //this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, this.set_active_mesh));
     }
 
     create_gui(){
@@ -313,6 +312,10 @@ var createScene = function () {
 
             sayhello_button.addEventListener("click", function(){
                 label_obj.highlight();
+            });
+
+            texture_u.addEventListener("input", function(){;
+                label_obj.update_texture();
             });
 
             if (texture_input.value != ""){
