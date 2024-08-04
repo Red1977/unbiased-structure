@@ -4,6 +4,7 @@ const texture_input = document.getElementById("texture_input");
 const texture_u = document.getElementById("tex_u");
 const texture_v = document.getElementById("tex_v");
 const size = document.getElementById("size");
+const screenshot = document.getElementById("screenshot");
 
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 var active_mesh = {};
@@ -314,6 +315,10 @@ var createScene = function () {
 
             sayhello_button.addEventListener("click", function(){
                 label_obj.highlight();
+            });
+
+            screenshot.addEventListener("click", function(){
+                label_obj.take_screenshot();
             });
 
             texture_u.addEventListener("input", function(){;
