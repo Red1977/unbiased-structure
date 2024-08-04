@@ -2,6 +2,8 @@ const canvas = document.getElementById("renderCanvas"); // Get the canvas elemen
 const sayhello_button = document.getElementById("sayhello_button");
 const texture_input = document.getElementById("texture_input");
 const texture_u = document.getElementById("tex_u");
+const texture_v = document.getElementById("tex_v");
+const size = document.getElementById("size");
 
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 var active_mesh = {};
@@ -162,14 +164,14 @@ class LabelMesh{
         var textureContext = this.target_texture.getContext();
         textureContext.clearRect(0,0,this.canvas_width, this.canvas_height);
 
-        var left = this.left[0] + (this.left[0] * (texture_u.value/100.0) );
-        var top = this.top[0] + this.texture_v_slider.value;
+        var left = this.left[0] + (this.left[0] * (texture_u.value/50.0) );
+        var top = this.top[0] +(this.top[0] * (texture_v.value/25.0) );
 
         textureContext.drawImage(this.image,
             left, 
             top, 
-            this.image.width * this.size.value, 
-            this.image.height * this.size.value);
+            this.image.width * size.value, 
+            this.image.height * size.value);
         
         this.target_texture.update(false);
     }
@@ -315,6 +317,14 @@ var createScene = function () {
             });
 
             texture_u.addEventListener("input", function(){;
+                label_obj.update_texture();
+            });
+
+            texture_v.addEventListener("input", function(){;
+                label_obj.update_texture();
+            });
+
+            size.addEventListener("input", function(){;
                 label_obj.update_texture();
             });
 
