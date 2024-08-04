@@ -51,10 +51,9 @@ class BackgroundMesh{
 }
 
 class LabelMesh{
-    constructor(mesh, DTWidth, DTHeight, gui, scene){
+    constructor(mesh, DTWidth, DTHeight, scene){
         this.canvas_width = DTWidth;
         this.canvas_height = DTHeight;
-        this.gui = gui;
         this.camera = scene.activeCamera;
         mesh.isPickable = true;
         all_meshes.push(this);
@@ -78,7 +77,6 @@ class LabelMesh{
         this.left = new Float32Array([0.0]);
         this.top = new Float32Array([0.0]);
 
-        this.create_gui();
         this.register_callbacks();
         
         
@@ -186,92 +184,6 @@ class LabelMesh{
         //this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, this.remove_highlight));
         //this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, this.set_active_mesh));
     }
-
-    create_gui(){
-        // GUI
-        const grid = new BABYLON.GUI.Grid();
-        grid.width = "250px";
-        grid.addColumnDefinition(250, true);
-        grid.addRowDefinition(30, true);
-        grid.addRowDefinition(30, true);
-        grid.addRowDefinition(30, true);
-        grid.addRowDefinition(30, true);
-        grid.addRowDefinition(30, true);
-        grid.addRowDefinition(30, true);
-        grid.addRowDefinition(30, true);
-        grid.background = "teal";
-        grid.isVisible = false;
-        grid.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        this.gui.addControl(grid);
-
-        var text1 = new BABYLON.GUI.TextBlock();
-        text1.text = this.mesh.name;
-        text1.color = "white";
-        text1.fontSize = 24;
-        grid.addControl(text1,0,0); 
-
-        var image_name_text = new BABYLON.GUI.TextBlock();
-        image_name_text.text = "...";
-        grid.addControl(image_name_text,2,0);
-
-        var tex_u = new BABYLON.GUI.Slider();
-        tex_u.minimum = -this.canvas_width/2;
-        tex_u.maximum = this.canvas_width/2;
-        tex_u.value = 0;
-        tex_u.height = "20px";
-        tex_u.width = "200px";
-        tex_u.background = "#84bfa9";
-        tex_u.color = "#46bd91";
-        tex_u.onValueChangedObservable.add(this.update_texture);
-
-        this.texture_u_slider = tex_u;
-
-        grid.addControl(tex_u,3,0);
-
-        var tex_v = new BABYLON.GUI.Slider();
-        tex_v.minimum = -this.canvas_height/2;
-        tex_v.maximum = this.canvas_height/2;
-        tex_v.value = 0;
-        tex_v.height = "20px";
-        tex_v.width = "200px";
-        tex_v.background = "#84bfa9";
-        tex_v.color = "#46bd91";
-        tex_v.onValueChangedObservable.add(this.update_texture);
-
-        this.texture_v_slider = tex_v;
-
-        grid.addControl(tex_v,4,0);
-
-        var size = new BABYLON.GUI.Slider();
-        size.minimum = 0.0;
-        size.maximum = 5.0;
-        size.step = 0.1
-        size.value = 1.0;
-        size.height = "20px";
-        size.width = "200px";
-        size.background = "#84bfa9";
-        size.color = "#46bd91";
-        size.onValueChangedObservable.add(this.update_texture);
-
-        this.size = size;
-
-        grid.addControl(size,5,0);
-
-        var screenshot_button = BABYLON.GUI.Button.CreateSimpleButton("but", "Screenshot");
-        screenshot_button.width = "200px";
-        screenshot_button.height = "20px";
-        screenshot_button.color = "white";
-        screenshot_button.background = "#84bfa9";
-        screenshot_button.onPointerClickObservable.add(this.take_screenshot);
-
-        this.screenshot_button = screenshot_button;
-        
-        grid.addControl(screenshot_button,6,0);
-
-        this.container = grid;
-        this.image_name_text = image_name_text;
-        
-    }
 }
 
 
@@ -285,9 +197,6 @@ var createScene = function () {
 
 	var groundWidth = 10;
     var groundHeight = 5;
-
-    //Whole screen UI
-    var guiTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI");
     
     console.log("glb_path:");
     console.log(glb_path);
@@ -311,7 +220,7 @@ var createScene = function () {
             background_plane = scene.getMeshByName("image_plane_world");
             
             background_obj = new BackgroundMesh(background_plane, scene);
-            label_obj = new LabelMesh(label1, 1024*(20/10), 1024, guiTexture, scene);
+            label_obj = new LabelMesh(label1, 1024*(20/10), 1024, scene);
 
             sayhello_button.addEventListener("click", function(){
                 label_obj.highlight();
