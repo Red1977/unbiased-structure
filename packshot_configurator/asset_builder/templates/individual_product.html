@@ -84,10 +84,14 @@
                     <input type="range" min="0.0" max="10.0" value="1.0" step="0.1" id="size">
                 </div>
                 <div>
-                    <div>
-                        <br>
-                        <button type="button" class="btn btn-dark" id="screenshot">screenshot</button>
-                    </div>
+                    <br>
+                    <button type="button" class="btn btn-dark" id="screenshot">screenshot</button>
+                </div>
+                <div>
+                    <br>
+                    <form action="render_result/{{product.product_name}}">
+                        <input type="submit" value="Render" />
+                    </form>
                 </div>
             </td>
         </tr>

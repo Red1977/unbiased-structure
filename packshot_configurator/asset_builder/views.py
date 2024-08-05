@@ -4,6 +4,10 @@ from django.template import loader
 from .models import Product
 from .forms import UploadFileForm
 from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+import datetime
+import random
+import bpy
 
 # Create your views here.
 
@@ -42,5 +46,31 @@ def product( request, id):
       'product': product,
       'form': form
     }
+
+  return HttpResponse(template.render(context, request))
+
+def render(request,product_name):
+
+  template = loader.get_template("render_result.html")
+  
+  print("rendering: {}".format(product_name))
+
+  import bpy
+  scene = bpy.context.scene
+  # Add a cube
+  bpy.ops.mesh.primitive_cone_add(vertices=32, radius1=1.0, radius2=0.0, depth=2.0, end_fill_type='NGON', calc_uvs=True, enter_editmode=False, align='WORLD', location=(0.0, 0.0, 0.0), rotation=(0.0, 0.0, 0.0), scale=(0.0, 0.0, 0.0))
+
+  # Render the scene
+  now = datetime.datetime.now()
+  image_suffix = "/renders/render_{}.png".format(str(datetime.datetime.timestamp(now)))
+  image_destination = "{}{}".format((settings.MEDIA_ROOT), image_suffix)
+  image_suffix_result = "/media/{}".format(image_suffix)
+  scene.render.filepath = image_destination  # Update this path
+  bpy.ops.render.render(write_still=True)
+
+  context = {
+    'product_name': product_name,
+    'render_url' : image_suffix_result
+  }
 
   return HttpResponse(template.render(context, request))
