@@ -135,8 +135,8 @@ class LabelMesh{
         var top = this.top;
 
         var tex_u_slider = texture_u;
-        var tex_v_slider = this.texture_v_slider;
-        var size_slider = this.size_slider;
+        var tex_v_slider = texture_v;
+        var size_slider = size;
         
         img.onload = function() {
             //Add image to dynamic texture
