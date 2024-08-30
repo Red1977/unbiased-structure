@@ -21,6 +21,7 @@ def products( request ):
   return HttpResponse(template.render(context, request))
 
 def product( request, id):
+  print("product view called")
   product = Product.objects.get(id=id)
   template = loader.get_template("individual_product.html")
 

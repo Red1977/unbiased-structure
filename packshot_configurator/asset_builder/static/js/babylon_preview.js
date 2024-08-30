@@ -134,9 +134,6 @@ class LabelMesh{
         var left = this.left;
         var top = this.top;
 
-        var tex_u_slider = texture_u;
-        var tex_v_slider = texture_v;
-        var size_slider = size;
         
         img.onload = function() {
             //Add image to dynamic texture
@@ -145,11 +142,8 @@ class LabelMesh{
             left[0] = label_width/2 - this.width/2;
             top[0] = label_height/2 - this.height/2;
 
-            textureContext.drawImage(this, left[0], top[0], this.width, this.height);
+            textureContext.drawImage(this, 0, 0, label_width, label_height);
             textureGround.update(false);
-            tex_u_slider.value = 0.0;
-            tex_v_slider.value = 0.0;
-            size_slider.value = 1.0;
 
         }
         this.mesh.material.albedoTexture = textureGround;
@@ -169,8 +163,8 @@ class LabelMesh{
         textureContext.drawImage(this.image,
             left, 
             top, 
-            this.image.width * size.value, 
-            this.image.height * size.value);
+            this.canvas_width * size.value, 
+            this.canvas_height * size.value);
         
         this.target_texture.update(false);
     }
