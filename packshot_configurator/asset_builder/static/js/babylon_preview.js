@@ -1,10 +1,10 @@
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const sayhello_button = document.getElementById("sayhello_button");
 const texture_input = document.getElementById("texture_input");
-const texture_u = document.getElementById("tex_u");
-const texture_v = document.getElementById("tex_v");
-const size = document.getElementById("size");
 const screenshot = document.getElementById("screenshot");
+var texture_u = document.getElementById("tex_u");
+var texture_v = document.getElementById("tex_v");
+var size = document.getElementById("size");
 
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 var active_mesh = {};
@@ -150,23 +150,28 @@ class LabelMesh{
         this.mesh.material.useAlphaFromAlbedoTexture = true;
         this.image_name_text = image_name_text;
         this.image = img;
+        this.uOffset = texture_u.value;
+        this.vOffset = texture_v.value;
 
     }
 
-    update_texture(){
-        var textureContext = this.target_texture.getContext();
-        textureContext.clearRect(0,0,this.canvas_width, this.canvas_height);
+    update_texture(){        
 
-        var left = this.left[0] + (this.left[0] * (texture_u.value/50.0) );
-        var top = this.top[0] +(this.top[0] * (texture_v.value/25.0) );
+        this.uOffset = texture_u.value;
+        this.vOffset = texture_v.value;
 
-        textureContext.drawImage(this.image,
-            left, 
-            top, 
-            this.canvas_width * size.value, 
-            this.canvas_height * size.value);
+        console.log("this.uOffset: " + this.uOffset + " this.vOffset: " + this.vOffset);
+
+        this.mesh.material.albedoTexture.uOffset = (-1 + (1.0 - this.uOffset)) / 10.0;
+        this.mesh.material.albedoTexture.vOffset = this.vOffset / 10.0;
+
+        if (size.value != 0.0 ){
+            this.mesh.material.albedoTexture.uScale = (1.0/ (size.value));
+            this.mesh.material.albedoTexture.vScale = (1.0/ (size.value));
+        }
+
+      
         
-        this.target_texture.update(false);
     }
 
     take_screenshot(){
