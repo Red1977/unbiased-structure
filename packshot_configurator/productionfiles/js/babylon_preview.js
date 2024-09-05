@@ -1,10 +1,12 @@
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const sayhello_button = document.getElementById("sayhello_button");
 const texture_input = document.getElementById("texture_input");
-const texture_u = document.getElementById("tex_u");
-const texture_v = document.getElementById("tex_v");
-const size = document.getElementById("size");
 const screenshot = document.getElementById("screenshot");
+var texture_u = document.getElementById("tex_u");
+var texture_v = document.getElementById("tex_v");
+var size = document.getElementById("size");
+var image_width = document.getElementById("image_width");
+var image_height = document.getElementById("image_height");
 
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 var active_mesh = {};
@@ -76,6 +78,8 @@ class LabelMesh{
 
         this.left = new Float32Array([0.0]);
         this.top = new Float32Array([0.0]);
+        this.saved_left = new Float32Array([0.0]);
+        this.saved_top = new Float32Array([0.0]);
 
         this.register_callbacks();
         
@@ -139,11 +143,19 @@ class LabelMesh{
             //Add image to dynamic texture
             textureContext.clearRect(0,0,label_width,label_height);
 
-            left[0] = label_width/2 - this.width/2;
-            top[0] = label_height/2 - this.height/2;
+            var image_to_canvas_height_ratio = label_height / this.height;
 
-            textureContext.drawImage(this, 0, 0, label_width, label_height);
+            var mapped_image_height = (this.height * image_to_canvas_height_ratio) - 1;
+            var mapped_image_width = (this.width * image_to_canvas_height_ratio) -1 ;
+
+            left[0] = label_width/2 - mapped_image_width/2;
+            top[0] = label_height/2 - mapped_image_height/2 ;
+
+            textureContext.drawImage(this, left[0], top[0], mapped_image_width, mapped_image_height);
             textureGround.update(false);
+
+            image_height.value = this.height;
+            image_width.value = this.width;
 
         }
         this.mesh.material.albedoTexture = textureGround;
@@ -151,22 +163,55 @@ class LabelMesh{
         this.image_name_text = image_name_text;
         this.image = img;
 
+        this.top = top;
+        this.left = left;
+        this.saved_left = left;
+        this.saved_top = top;
+        this.saved_size = 1.0;
+        this.saved_texture_u = 0;
+        this.saved_texture_v = 0;
+
     }
 
-    update_texture(){
+    update_texture(){        
+
         var textureContext = this.target_texture.getContext();
         textureContext.clearRect(0,0,this.canvas_width, this.canvas_height);
 
-        var left = this.left[0] + (this.left[0] * (texture_u.value/50.0) );
-        var top = this.top[0] +(this.top[0] * (texture_v.value/25.0) );
+        var image_to_canvas_height_ratio = this.canvas_height / this.image.height;
+
+        var mapped_image_height = (this.image.height * image_to_canvas_height_ratio)-1;
+        var mapped_image_width = (this.image.width * image_to_canvas_height_ratio)-1;
+
+        var udiff = texture_u.value - this.saved_texture_u;
+        var vdiff = texture_v.value - this.saved_texture_v;
+
+        var left = this.saved_left[0] + udiff;
+        var top = this.saved_top[0] + vdiff;
+
+        if(this.saved_size != size.value){
+            var size_diff = size.value - this.saved_size;
+            var width_diff = this.canvas_width * size_diff;
+            var height_diff = this.canvas_height * size_diff;
+            left = this.saved_left - (width_diff/2);
+            top = this.saved_top - (height_diff/2);
+        }
 
         textureContext.drawImage(this.image,
             left, 
             top, 
-            this.canvas_width * size.value, 
-            this.canvas_height * size.value);
-        
+            mapped_image_width * size.value, 
+            mapped_image_height * size.value);
+
         this.target_texture.update(false);
+
+        this.saved_size = size.value;
+        this.saved_left[0] = left;
+        this.saved_top[0] = top;
+
+        this.saved_texture_u = texture_u.value;
+        this.saved_texture_v = texture_v.value;
+      
     }
 
     take_screenshot(){
@@ -188,9 +233,6 @@ var createScene = function () {
 
     var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
 	light.intensity = 0.7;
-
-	var groundWidth = 10;
-    var groundHeight = 5;
     
     console.log("glb_path:");
     console.log(glb_path);
@@ -208,17 +250,14 @@ var createScene = function () {
             studio_env.name = "studio_env";
             studio_env.gammaSpace = false;
             scene.environmentTexture = studio_env;
+            console.log("start");
 
             label1 = scene.getMeshByName("Label");
 
             background_plane = scene.getMeshByName("image_plane_world");
             
             background_obj = new BackgroundMesh(background_plane, scene);
-            label_obj = new LabelMesh(label1, 1024*(20/10), 1024, scene);
-
-            sayhello_button.addEventListener("click", function(){
-                label_obj.highlight();
-            });
+            label_obj = new LabelMesh(label1, 1024, 1024, scene);
 
             screenshot.addEventListener("click", function(){
                 label_obj.take_screenshot();
@@ -239,6 +278,7 @@ var createScene = function () {
             if (texture_input.value != ""){
                 label_obj.upload_image_to_texture();
             }
+
             
             var pipeline = new BABYLON.DefaultRenderingPipeline(
                 "defaultPipeline", // The name of the pipeline
