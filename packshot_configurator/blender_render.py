@@ -1,25 +1,37 @@
 import bpy
 import argparse
+import shutil
+import datetime
+import os
+
 
 def blender_render(image_destination):
   try:
-      print("inside bpy")
-      scene = bpy.context.scene
+      print("Copying base scene file")
+      now = datetime.datetime.now()
+      time_insert = now.strftime("%c").replace(" ", "_").replace(":","_")
+
+      source_scenefile = "C:\\Users\\siobh\\unbiased-structure\\packshot_configurator\\media\\pump_bottle_experiment_with_label_placement_script_experiments.blend"
+      source_scenefile_bits = os.path.splitext(source_scenefile)
+
+      destination_scenefile = time_insert.join(source_scenefile_bits)
+
+      shutil.copy2(source_scenefile, destination_scenefile)
+
+      #open the newly copied scene
+      bpy.ops.wm.open_mainfile(filepath=destination_scenefile)
+
+      #set the label texture to the uploaded image
+      bpy.data.materials["Material.007"].node_tree.nodes["Image Texture.001"].image = bpy.data.images.load("C:\\Users\\siobh\\unbiased-structure\\packshot_configurator\\media\\big_jigglypuff.png")
+
+      #nudge it up a bit for lols
+      bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[1] = 0.1
       
-      scene.render.filepath = image_destination  # Update this path
+      bpy.context.scene.render.filepath = image_destination  # Update this path
 
-      try:
-        bpy.data.objects.remove(bpy.data.objects["Cube"])
-      except:
-        pass
-
-      bpy.ops.mesh.primitive_cylinder_add(radius=1, depth=2, enter_editmode=False, align='WORLD', location=(-1, 0, 0), scale=(1, 1, 1))
-      bpy.ops.mesh.primitive_ico_sphere_add(radius=1, enter_editmode=False, align='WORLD', location=(1, 0, 0), scale=(1, 1, 1))
-      bpy.ops.mesh.primitive_monkey_add(size=2, enter_editmode=False, align='WORLD', location=(0, 0, 1), scale=(0.1, 0.1, 0.1))
-
-      print("render")
+      print(">>> rendering Scene")
       bpy.context.scene.render.engine = 'CYCLES'
-      #bpy.context.scene.cycles.device = 'GPU' #TODO: benchmark this
+      bpy.context.scene.cycles.device = 'GPU' #TODO: benchmark this
 
       bpy.ops.render.render(write_still=True)
     
