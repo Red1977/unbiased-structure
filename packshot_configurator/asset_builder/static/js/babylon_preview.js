@@ -41,10 +41,6 @@ class BackgroundMesh{
     deactivate_meshes(){
         active_mesh = {};
         console.log("deactivating meshes");
-        //set all UIs to invisible
-        for (let mesh of all_meshes) {
-            mesh.container.isVisible = false;
-        }
     }
 
     register_callbacks(){
@@ -56,6 +52,11 @@ class LabelMesh{
     constructor(mesh, DTWidth, DTHeight, scene){
         this.canvas_width = DTWidth;
         this.canvas_height = DTHeight;
+        this.label_moving = false;
+        this.texture_uploaded = false;
+        this.screen_x = 0;
+        this.screen_y = 0;
+        this.zoom_amount = 1.0;
         this.camera = scene.activeCamera;
         mesh.isPickable = true;
         all_meshes.push(this);
@@ -88,17 +89,11 @@ class LabelMesh{
 
     set_active_mesh(){
         active_mesh = this.mesh;
-
-        //set all UIs invisibly
-        for (let mesh of all_meshes) {
-            mesh.container.isVisible = false;
-        }
-        this.container.isVisible = true;
         this.upload_image_to_texture();
     }
 
     highlight(){
-        if (!this.container.isVisible){
+        if (!this.container.isVisible && !this.texture_uploaded){
             this.highlight_layer.addMesh(this.mesh, BABYLON.Color3.Teal()); 
         }
     }
@@ -114,19 +109,18 @@ class LabelMesh{
         var img = new Image();
         var image_name_text = this.image_name_text;
 
-        /*input.onchange = () => {
+        input.onchange = () => {
             const files = Array.from(input.files);
             const file = files[0];
 
             const reader = new FileReader();
             reader.onload = function (e) {
                     img.src =  e.target.result;
-                    image_name_text.text = file.name;
             };
             reader.readAsDataURL(file);
             
         };
-        input.click();*/
+        input.click();
 
         img.src = texture_input.value;
 
@@ -168,8 +162,10 @@ class LabelMesh{
         this.saved_left = left;
         this.saved_top = top;
         this.saved_size = 1.0;
-        this.saved_texture_u = 0;
-        this.saved_texture_v = 0;
+        this.texture_uploaded = true;
+        this.image = img;
+        this.zoom_amount = 1.0;
+        this.remove_highlight();
 
     }
 
@@ -183,14 +179,15 @@ class LabelMesh{
         var mapped_image_height = (this.image.height * image_to_canvas_height_ratio)-1;
         var mapped_image_width = (this.image.width * image_to_canvas_height_ratio)-1;
 
-        var udiff = texture_u.value - this.saved_texture_u;
-        var vdiff = texture_v.value - this.saved_texture_v;
+        var udiff = (scene.pointerX - this.screen_x) * 2;
+
+        var vdiff = (scene.pointerY - this.screen_y) * 2;
 
         var left = this.saved_left[0] + udiff;
         var top = this.saved_top[0] + vdiff;
 
-        if(this.saved_size != size.value){
-            var size_diff = size.value - this.saved_size;
+        if(this.saved_size != this.zoom_amount){
+            var size_diff = this.zoom_amount - this.saved_size;
             var width_diff = this.canvas_width * size_diff;
             var height_diff = this.canvas_height * size_diff;
             left = this.saved_left - (width_diff/2);
@@ -200,17 +197,17 @@ class LabelMesh{
         textureContext.drawImage(this.image,
             left, 
             top, 
-            mapped_image_width * size.value, 
-            mapped_image_height * size.value);
+            mapped_image_width * this.zoom_amount, 
+            mapped_image_height * this.zoom_amount);
 
         this.target_texture.update(false);
 
-        this.saved_size = size.value;
+        this.saved_size = this.zoom_amount;
         this.saved_left[0] = left;
         this.saved_top[0] = top;
 
-        this.saved_texture_u = texture_u.value;
-        this.saved_texture_v = texture_v.value;
+        this.screen_x = scene.pointerX;
+        this.screen_y = scene.pointerY;
       
     }
 
@@ -259,21 +256,60 @@ var createScene = function () {
             
             background_obj = new BackgroundMesh(background_plane, scene);
             label_obj = new LabelMesh(label1, 1024, 1024, scene);
+            label1.label_object = label_obj;
+            label1.isLabel = true;
 
             screenshot.addEventListener("click", function(){
                 label_obj.take_screenshot();
             });
 
-            texture_u.addEventListener("input", function(){;
-                label_obj.update_texture();
-            });
-
-            texture_v.addEventListener("input", function(){;
-                label_obj.update_texture();
-            });
-
-            size.addEventListener("input", function(){;
-                label_obj.update_texture();
+            scene.onPointerObservable.add((pointerInfo) => {      		
+                switch (pointerInfo.type) {
+                    case BABYLON.PointerEventTypes.POINTERDOWN:
+                        if(pointerInfo.pickInfo.hit) {
+                            if(pointerInfo.pickInfo.pickedMesh.isLabel){
+                                if(pointerInfo.pickInfo.pickedMesh.label_object.texture_uploaded == false){
+                                    pointerInfo.pickInfo.pickedMesh.label_object.set_active_mesh();
+                                }
+                                else{
+                                    pointerInfo.pickInfo.pickedMesh.label_object.label_moving = true;
+                                    pointerInfo.pickInfo.pickedMesh.label_object.screen_x = scene.pointerX;
+                                    pointerInfo.pickInfo.pickedMesh.label_object.screen_y = scene.pointerY;
+                                }
+                            }
+                        }
+                        break;
+                    case BABYLON.PointerEventTypes.POINTERUP:
+                        //TODO ; set all labels to not moving
+                        label1.label_object.label_moving = false;
+                        break;
+                    case BABYLON.PointerEventTypes.POINTERMOVE:
+                        //TODO cycle through labels to see which one is moving
+                            console.log("Drag activated");
+                            if(label1.label_object.label_moving){
+                                label1.label_object.update_texture();
+                            }
+                        break;
+                    case BABYLON.PointerEventTypes.POINTERDOUBLETAP:
+                        if(pointerInfo.pickInfo.hit) {
+                            pointerInfo.pickInfo.pickedMesh.label_object.set_active_mesh();
+                        }
+                        break;
+                    case BABYLON.PointerEventTypes.POINTERWHEEL:
+                        if(pointerInfo.event.wheelDelta > 0){
+                            //alert("zoom in!");
+                            pointerInfo.pickInfo.pickedMesh.label_object.zoom_amount =  pointerInfo.pickInfo.pickedMesh.label_object.zoom_amount * 1.1;
+                            label1.label_object.update_texture();
+                        }
+                        if(pointerInfo.event.wheelDelta < 0){
+                            pointerInfo.pickInfo.pickedMesh.label_object.zoom_amount =  pointerInfo.pickInfo.pickedMesh.label_object.zoom_amount * 0.9;
+                            label1.label_object.update_texture();
+                            //alert("zoom out");
+                        }
+                        //pointerInfo.pickInfo.pickedMesh.label_object.update_texture();
+                        break;
+                    
+                }
             });
 
             if (texture_input.value != ""){
