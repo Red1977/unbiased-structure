@@ -1,3 +1,11 @@
+
+//"https://red1977.github.io/urban-octo-robot/"
+//
+//server+"/assets/", "pump_bottle_for_babylon_rear_proj_v03.glb"
+//
+//docs/assets/pump_bottle_render_layers_beauty.png
+
+
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const sayhello_button = document.getElementById("sayhello_button");
 const texture_input = document.getElementById("texture_input");
@@ -7,6 +15,9 @@ var texture_v = document.getElementById("tex_v");
 var size = document.getElementById("size");
 var image_width = document.getElementById("image_width");
 var image_height = document.getElementById("image_height");
+var horizontal_offset = document.getElementById("horizontal_offset");
+var vertical_offset = document.getElementById("vertical_offset");
+var scale = document.getElementById("scale");
 
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 var active_mesh = {};
@@ -208,6 +219,8 @@ class LabelMesh{
 
         this.screen_x = scene.pointerX;
         this.screen_y = scene.pointerY;
+
+        horizontal_offset.value = left;
       
     }
 

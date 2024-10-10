@@ -40,6 +40,12 @@
         <script src="https://cdn.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
         <script src="https://cdn.babylonjs.com/accessibility/babylon.accessibility.js"></script>
 
+        <script>
+            function transfer__values() {
+                document.getElementById("h_offset").value = document.getElementById("horizontal_offset").value;
+            }
+        </script>
+
 
     </head>
 
@@ -61,35 +67,21 @@
                     <button type="submit">Upload</button>
                     <input type="hidden" id="texture_input"></input>
                 </form>
-                <output id="image_width">0.0</output>
+                <input type="hidden" id="horizontal_offset" />
+
+                <input type="hidden" id="image_width" />
                 <br>
-                <output id="image_height">0.0</output>
-                <div>
-                    <p></p>
-                    <p>Horizontal: </p>
-                    <input type="range" min="-1024.0" max="1024.0" value="0.0" step="0.1" id="tex_u" oninput="this.nextElementSibling.value = this.value">
-                    <output>0.0</output>
-                </div>
-                <div>
-                    <p></p>
-                    <p>Vertical: </p>
-                    <input type="range" min="-1024.0" max="1024.0" value="0.0" step="0.1" id="tex_v" oninput="this.nextElementSibling.value = this.value">
-                    <output>0.0</output>
-                </div>
-                <div>
-                    <p></p>
-                    <p>Size: </p>
-                    <input type="range" min="0.0" max="3.0" value="1.0" step="0.0001" id="size" oninput="this.nextElementSibling.value = this.value">
-                    <output>1.0</output>
-                </div>
+                <input type= "hidden" id="image_height" />
+                
                 <div>
                     <br>
                     <button type="button" class="btn btn-dark" id="screenshot">screenshot</button>
                 </div>
                 <div>
                     <br>
-                    <form action="render_result/{{product.product_name}}">
-                        <input type="submit" value="Render" />
+                    <form action="render_result/{{product.product_name}}" onsubmit="transfer__values()">
+                        <input type="hidden" id=h_offset name="h_offset"/> 
+                        <input type="submit" value="Render Specifics"/>
                     </form>
                 </div>
             </td>

@@ -55,6 +55,9 @@ def render(request,product_name):
   #TODO only render if input has changed - create a new context if it has
 
   template = loader.get_template("render_result.html")
+
+  h_offset = request.GET.get('h_offset', '')
+  print("h_offset: {}".format(h_offset))
   
   print("rendering: {}".format(product_name))
 
@@ -62,7 +65,7 @@ def render(request,product_name):
   image_suffix = "/renders/render_{}.png".format(str(datetime.datetime.timestamp(now)))
   image_destination = "{}{}".format((settings.MEDIA_ROOT), image_suffix)
   image_suffix_result = "/media/{}".format(image_suffix)
-  subprocess.run(["python", "blender_render.py", image_destination])
+  #subprocess.run(["python", "blender_render.py", image_destination])
   
   print("finished rendering")
 
