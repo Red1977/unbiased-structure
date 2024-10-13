@@ -7,7 +7,8 @@ from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 import datetime
 import subprocess
-
+import io
+import base64
 
 # Create your views here.
 
@@ -56,8 +57,22 @@ def render(request,product_name):
 
   template = loader.get_template("render_result.html")
 
-  h_offset = request.GET.get('h_offset', '')
-  print("h_offset: {}".format(h_offset))
+  horizontal_offset = request.POST.get("horizontal_offset", "")
+  if horizontal_offset is not "":
+    print("horizontal_offset: {}".format(horizontal_offset))
+  else:
+    print("horizontal_offset not set")
+
+  filestr = request.POST.get("texture_input", "")
+  file_name = request.POST.get("texture_name", "")
+  byte_string = filestr.split(",")[1]
+  file = io.BytesIO(base64.urlsafe_b64decode(byte_string))
+
+  fs = FileSystemStorage()
+  filename = fs.save(file_name, file)
+  file_url = fs.url(filename)
+
+  print("file_url : {}".format(file_url))
   
   print("rendering: {}".format(product_name))
 

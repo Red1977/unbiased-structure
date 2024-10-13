@@ -40,13 +40,6 @@
         <script src="https://cdn.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
         <script src="https://cdn.babylonjs.com/accessibility/babylon.accessibility.js"></script>
 
-        <script>
-            function transfer__values() {
-                document.getElementById("h_offset").value = document.getElementById("horizontal_offset").value;
-            }
-        </script>
-
-
     </head>
 
    <body>
@@ -61,17 +54,6 @@
             <td valign="top">
                 <!-- Controls -->
                 <br>
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit">Upload</button>
-                    <input type="hidden" id="texture_input"></input>
-                </form>
-                <input type="hidden" id="horizontal_offset" />
-
-                <input type="hidden" id="image_width" />
-                <br>
-                <input type= "hidden" id="image_height" />
                 
                 <div>
                     <br>
@@ -79,24 +61,17 @@
                 </div>
                 <div>
                     <br>
-                    <form action="render_result/{{product.product_name}}" onsubmit="transfer__values()">
-                        <input type="hidden" id=h_offset name="h_offset"/> 
+                    <form method="POST" action="render_result/{{product.product_name}}" enctype="multipart/form-data" >
+                        {% csrf_token %}
+                        <input type="hidden" id=horizontal_offset name="horizontal_offset"/> 
+                        <input type="hidden" id=texture_name name="texture_name"/>
+                        <input type="hidden" id=texture_input name="texture_input"/> 
                         <input type="submit" value="Render Specifics"/>
                     </form>
                 </div>
             </td>
         </tr>
     </table>
-
-    {% if file_url %}
-
-        <script type="text/javascript">
-            { 
-                    document.getElementById("texture_input").value = "{{ file_url }}";
-            };
-        </script>
-
-    {% endif %}
 
     <script type="text/javascript"  src="{% static 'js/babylon_preview.js' %}"
                                     defer

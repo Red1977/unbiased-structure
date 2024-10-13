@@ -8,16 +8,12 @@
 
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const sayhello_button = document.getElementById("sayhello_button");
-const texture_input = document.getElementById("texture_input");
 const screenshot = document.getElementById("screenshot");
-var texture_u = document.getElementById("tex_u");
-var texture_v = document.getElementById("tex_v");
-var size = document.getElementById("size");
-var image_width = document.getElementById("image_width");
-var image_height = document.getElementById("image_height");
 var horizontal_offset = document.getElementById("horizontal_offset");
 var vertical_offset = document.getElementById("vertical_offset");
 var scale = document.getElementById("scale");
+var texture_input = document.getElementById("texture_input");
+var texture_name = document.getElementById("texture_name");
 
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 var active_mesh = {};
@@ -127,13 +123,13 @@ class LabelMesh{
             const reader = new FileReader();
             reader.onload = function (e) {
                     img.src =  e.target.result;
+                    texture_input.value = e.target.result;
+                    texture_name.value = file.name;
             };
             reader.readAsDataURL(file);
             
         };
         input.click();
-
-        img.src = texture_input.value;
 
         var textureContext = this.target_texture.getContext();
         var textureGround = this.target_texture;
