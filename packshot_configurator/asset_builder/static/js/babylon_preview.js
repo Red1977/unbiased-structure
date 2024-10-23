@@ -14,6 +14,8 @@ var vertical_offset = document.getElementById("vertical_offset");
 var scale = document.getElementById("scale");
 var texture_input = document.getElementById("texture_input");
 var texture_name = document.getElementById("texture_name");
+var image_height = document.getElementById("image_height");
+var image_width = document.getElementById("image_width");
 
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 var active_mesh = {};
@@ -174,6 +176,11 @@ class LabelMesh{
         this.zoom_amount = 1.0;
         this.remove_highlight();
 
+        //DOM elements to communicate back to HTML
+        horizontal_offset.value = 0.0;
+        vertical_offset.value = 0.0;
+        scale.value = 1.0;
+
     }
 
     update_texture(){        
@@ -217,6 +224,8 @@ class LabelMesh{
         this.screen_y = scene.pointerY;
 
         horizontal_offset.value = left;
+        vertical_offset.value = top;
+        scale.value = this.zoom_amount;
       
     }
 

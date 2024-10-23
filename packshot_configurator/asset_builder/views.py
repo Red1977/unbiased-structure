@@ -57,12 +57,13 @@ def render(request,product_name):
 
   template = loader.get_template("render_result.html")
 
-  horizontal_offset = request.POST.get("horizontal_offset", "")
-  if horizontal_offset is not "":
-    print("horizontal_offset: {}".format(horizontal_offset))
-  else:
-    print("horizontal_offset not set")
-
+  horizontal_offset = request.POST.get("horizontal_offset", "0.0")
+  vertical_offset = request.POST.get("vertical_offset", "0.0")
+  image_height = request.POST.get("image_height", "100.0")
+  image_width = request.POST.get("image_width", "100.0")
+  scale = request.POST.get("scale", "1.0")
+  
+  #TODO: error checking and early return to custom error page
   filestr = request.POST.get("texture_input", "")
   file_name = request.POST.get("texture_name", "")
   byte_string = filestr.split(",")[1]
@@ -80,7 +81,7 @@ def render(request,product_name):
   image_suffix = "/renders/render_{}.png".format(str(datetime.datetime.timestamp(now)))
   image_destination = "{}{}".format((settings.MEDIA_ROOT), image_suffix)
   image_suffix_result = "/media/{}".format(image_suffix)
-  #subprocess.run(["python", "blender_render.py", image_destination])
+  subprocess.run(["python", "blender_render.py", image_destination, file_url, image_height, image_width, horizontal_offset, vertical_offset, scale])
   
   print("finished rendering")
 

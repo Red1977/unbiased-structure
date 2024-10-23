@@ -63,10 +63,14 @@
                     <br>
                     <form method="POST" action="render_result/{{product.product_name}}" enctype="multipart/form-data" >
                         {% csrf_token %}
-                        <input type="hidden" id=horizontal_offset name="horizontal_offset"/> 
-                        <input type="hidden" id=texture_name name="texture_name"/>
-                        <input type="hidden" id=texture_input name="texture_input"/> 
-                        <input type="submit" value="Render Specifics"/>
+                        <input type="hidde" id=horizontal_offset name="horizontal_offset"/> 
+                        <input type="hidde" id=vertical_offset name="vertical_offset"/> 
+                        <input type="hidde" id=image_height name="image_height"/> 
+                        <input type="hidde" id=image_width name="image_width"/> 
+                        <input type="hidde" id=scale name="scale"/> 
+                        <input type="hidde" id=texture_name name="texture_name"/>
+                        <input type="hidde" id=texture_input name="texture_input"/> 
+                        <input type="submit" value="Render Image"/>
                     </form>
                 </div>
             </td>
