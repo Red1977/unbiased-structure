@@ -33,19 +33,18 @@ def blender_render(image_destination, file_url, image_height, image_width, horiz
         #set the label texture to the uploaded image
         bpy.data.materials["Material.007"].node_tree.nodes["Image Texture.001"].image = bpy.data.images.load("C:/Users/siobh/unbiased-structure/packshot_configurator/{}".format(file_url))
 
-        #Set the x scale of the image 
+        #Set the initial x scale of the image 
         x_scale = image_width/ image_height
         bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[3].default_value[0] = x_scale
 
-        #set the initial x position of the image
-        x_initial = 1.0 - (x_scale/2.0)
-        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[0]
-
         #Set the offset position of the image
-        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[0] = horizontal_offset/1000.0
-        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[1] = (vertical_offset/1000.0)*-1
+        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[0] = (horizontal_offset/1000.0)
+        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[1] = (vertical_offset/1000.0)
 
         #set the image scale
+        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[3].default_value[0] *= scale
+        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[3].default_value[1] *= scale
+        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[3].default_value[2] *= scale
 
         bpy.context.scene.render.filepath = image_destination  # Update this path
 

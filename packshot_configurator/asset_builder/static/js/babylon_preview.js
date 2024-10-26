@@ -140,7 +140,6 @@ class LabelMesh{
 
         var left = this.left;
         var top = this.top;
-
         
         img.onload = function() {
             //Add image to dynamic texture
@@ -160,6 +159,10 @@ class LabelMesh{
             image_height.value = this.height;
             image_width.value = this.width;
 
+            //DOM elements to communicate back to HTML
+            horizontal_offset.value = left[0];
+            vertical_offset.value = top[0];
+
         }
         this.mesh.material.albedoTexture = textureGround;
         this.mesh.material.useAlphaFromAlbedoTexture = true;
@@ -170,15 +173,13 @@ class LabelMesh{
         this.left = left;
         this.saved_left = left;
         this.saved_top = top;
+        this.saved_blender_top = top[0];
         this.saved_size = 1.0;
         this.texture_uploaded = true;
         this.image = img;
         this.zoom_amount = 1.0;
         this.remove_highlight();
 
-        //DOM elements to communicate back to HTML
-        horizontal_offset.value = 0.0;
-        vertical_offset.value = 0.0;
         scale.value = 1.0;
 
     }
@@ -199,6 +200,7 @@ class LabelMesh{
 
         var left = this.saved_left[0] + udiff;
         var top = this.saved_top[0] + vdiff;
+        var blender_top = this.saved_blender_top - vdiff;
 
         if(this.saved_size != this.zoom_amount){
             var size_diff = this.zoom_amount - this.saved_size;
@@ -206,6 +208,7 @@ class LabelMesh{
             var height_diff = this.canvas_height * size_diff;
             left = this.saved_left - (width_diff/2);
             top = this.saved_top - (height_diff/2);
+            blender_top = this.saved_blender_top - (height_diff/2);
         }
 
         textureContext.drawImage(this.image,
@@ -219,13 +222,15 @@ class LabelMesh{
         this.saved_size = this.zoom_amount;
         this.saved_left[0] = left;
         this.saved_top[0] = top;
+        this.saved_blender_top = blender_top;
 
         this.screen_x = scene.pointerX;
         this.screen_y = scene.pointerY;
 
+        //set DOM element values to communicate back to HTML for use in Blender
         horizontal_offset.value = left;
-        vertical_offset.value = top;
         scale.value = this.zoom_amount;
+        vertical_offset.value = blender_top;
       
     }
 
