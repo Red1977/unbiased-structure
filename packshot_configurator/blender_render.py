@@ -38,8 +38,8 @@ def blender_render(image_destination, file_url, image_height, image_width, horiz
         bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[3].default_value[0] = x_scale
 
         #Set the offset position of the image
-        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[0] = (horizontal_offset/1000.0)
-        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[1] = (vertical_offset/1000.0)
+        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[0] = (horizontal_offset/1024.0)
+        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[1] = (vertical_offset/1024.0)
 
         #set the image scale
         bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[3].default_value[0] *= scale

@@ -174,6 +174,7 @@ class LabelMesh{
         this.saved_left = left;
         this.saved_top = top;
         this.saved_blender_top = top[0];
+        this.saved_blender_left = left[0];
         this.saved_size = 1.0;
         this.texture_uploaded = true;
         this.image = img;
@@ -186,6 +187,8 @@ class LabelMesh{
 
     update_texture(){        
 
+        //TODO: Also need to apply offset scaling to horizontal offset for Blender
+
         var textureContext = this.target_texture.getContext();
         textureContext.clearRect(0,0,this.canvas_width, this.canvas_height);
 
@@ -195,12 +198,12 @@ class LabelMesh{
         var mapped_image_width = (this.image.width * image_to_canvas_height_ratio)-1;
 
         var udiff = (scene.pointerX - this.screen_x) * 2;
-
         var vdiff = (scene.pointerY - this.screen_y) * 2;
 
         var left = this.saved_left[0] + udiff;
         var top = this.saved_top[0] + vdiff;
         var blender_top = this.saved_blender_top - vdiff;
+        var blender_left = this.saved_blender_left - udiff;
 
         if(this.saved_size != this.zoom_amount){
             var size_diff = this.zoom_amount - this.saved_size;
@@ -209,6 +212,7 @@ class LabelMesh{
             left = this.saved_left - (width_diff/2);
             top = this.saved_top - (height_diff/2);
             blender_top = this.saved_blender_top - (height_diff/2);
+            blender_left = this.saved_blender_left - (width_diff/2);
         }
 
         textureContext.drawImage(this.image,
@@ -223,6 +227,7 @@ class LabelMesh{
         this.saved_left[0] = left;
         this.saved_top[0] = top;
         this.saved_blender_top = blender_top;
+        this.saved_blender_left = blender_left;
 
         this.screen_x = scene.pointerX;
         this.screen_y = scene.pointerY;
