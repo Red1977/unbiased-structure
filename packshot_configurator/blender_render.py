@@ -3,10 +3,18 @@ import argparse
 import shutil
 import datetime
 import os
+import json
 
 
-def blender_render(image_destination, file_url, image_height, image_width, horizontal_offset, vertical_offset, scale):
+def blender_render(image_destination, file_url, image_height, image_width, horizontal_offset, vertical_offset, scale, myjson):
     try:
+        print("--JSON ")
+        json_data = json.loads(myjson)
+        for key, value in json_data.items():
+            print("> {} : {}".format(key, value))
+
+        print("------ ")
+
         print("--Rendering with settings----")
         print("image_destination: {}".format(image_destination))
         print("file_url: {}".format(file_url))
@@ -68,10 +76,11 @@ if __name__ == "__main__":
     parser.add_argument("horizontal_offset", type=float)
     parser.add_argument("vertical_offset", type=float)
     parser.add_argument("scale", type=float)
+    parser.add_argument("myjson", type=str)
 
     args = parser.parse_args()
     
-    blender_render(args.image_destination, args.file_url, args.image_height, args.image_width, args.horizontal_offset, args.vertical_offset, args.scale)
+    blender_render(args.image_destination, args.file_url, args.image_height, args.image_width, args.horizontal_offset, args.vertical_offset, args.scale, args.myjson)
 
 
 

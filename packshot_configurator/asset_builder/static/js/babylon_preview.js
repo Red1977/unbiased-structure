@@ -16,6 +16,10 @@ var texture_input = document.getElementById("texture_input");
 var texture_name = document.getElementById("texture_name");
 var image_height = document.getElementById("image_height");
 var image_width = document.getElementById("image_width");
+var json = document.getElementById("myjson")
+var some_things = {text:"Hello", horizontal_offset:100.0};
+console.log(">>> JSON: " + JSON.stringify(some_things));
+json.value = JSON.stringify(some_things);
 
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 var active_mesh = {};

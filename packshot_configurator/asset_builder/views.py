@@ -62,6 +62,15 @@ def render(request,product_name):
   image_height = request.POST.get("image_height", "100.0")
   image_width = request.POST.get("image_width", "100.0")
   scale = request.POST.get("scale", "1.0")
+
+  print(">>>>>>>>>>>>>> POST ")
+  print(request.POST.keys())
+  print("-----------------------")
+
+  myjson = request.POST.get("myjson", "")
+  print(">>>>>>>> json")
+  print(myjson)
+  print("-------------")
   
   #TODO: error checking and early return to custom error page
   filestr = request.POST.get("texture_input", "")
@@ -81,7 +90,7 @@ def render(request,product_name):
   image_suffix = "/renders/render_{}.png".format(str(datetime.datetime.timestamp(now)))
   image_destination = "{}{}".format((settings.MEDIA_ROOT), image_suffix)
   image_suffix_result = "/media/{}".format(image_suffix)
-  subprocess.run(["python", "blender_render.py", image_destination, file_url, image_height, image_width, horizontal_offset, vertical_offset, scale])
+  subprocess.run(["python", "blender_render.py", image_destination, file_url, image_height, image_width, horizontal_offset, vertical_offset, scale, myjson])
   
   print("finished rendering")
 
