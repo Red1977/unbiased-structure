@@ -9,5 +9,6 @@ class Product(models.Model):
     size_ml = models.PositiveIntegerField()
     thumbnail_path = models.CharField(max_length=255, null=True)
     background_image = models.CharField(max_length=255, null=True)
+    num_labels = models.PositiveBigIntegerField(default=1)
 
 

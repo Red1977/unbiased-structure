@@ -46,6 +46,7 @@ def product( request, id):
 
     context = {
       'product': product,
+      'num_labels' : range(product.num_labels),
       'form': form
     }
 

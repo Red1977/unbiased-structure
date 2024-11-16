@@ -71,6 +71,10 @@
                         <input type="hidden" id=texture_name name="texture_name"/>
                         <input type="hidden" id=texture_input name="texture_input"/> 
                         <input type="hidden" id="myjson" name="myjson"/>
+                        <input type="hidden" id="json_texture_settings" name="json_texture_settings"/>
+                        {% for i in num_labels %}
+                        <input type="text" id="label{{ forloop.counter }}" name="label{{ forloop.counter }}" value="{{ forloop.counter }}"/>
+                        {% endfor %}
                         <input type="submit" value="Render Image"/>
                     </form>
                 </div>
