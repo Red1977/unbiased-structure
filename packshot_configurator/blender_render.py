@@ -5,30 +5,54 @@ import datetime
 import os
 import json
 
+def create_material(label_number, mesh):
+    """
+    """
+    #create the material
+    label_mat_name = "label{}_material".format(label_number)
+    label_mat = bpy.data.materials.new(label_mat_name)
+    label_mat.use_nodes = True
 
-def blender_render(image_destination, file_url, image_height, image_width, horizontal_offset, vertical_offset, scale, myjson):
+    #find the principlbsdf node
+    principled_bsdf = label_mat.node_tree.nodes["Principled BSDF"]
+
+    #create image node network
+    image_tex = label_mat.node_tree.nodes.new("ShaderNodeTexImage")
+    tex_coords = label_mat.node_tree.nodes.new("ShaderNodeTexCoord")
+    tex_mapping = label_mat.node_tree.nodes.new("ShaderNodeMapping")
+
+    #put the new nodes in a better layout
+    image_tex.location = ()
+    principled_bsdf.location = (100, 250)
+    image_tex.location = (-250, 250)
+    tex_mapping.location = (-500, 250)
+    tex_coords.location = (-750, 250)
+
+    #build connections
+    label_mat.node_tree.links.new(tex_mapping.inputs['Vector'], tex_coords.outputs['UV'])
+    label_mat.node_tree.links.new(image_tex.inputs['Vector'], tex_mapping.outputs['Vector'])
+    label_mat.node_tree.links.new(principled_bsdf.inputs['Base Color'], image_tex.outputs['Color'])
+    label_mat.node_tree.links.new(principled_bsdf.inputs['Alpha'], image_tex.outputs['Alpha'])
+
+
+
+def blender_render(image_destination, label_info):
     try:
+        #TODO: loop around label list/ dict structure creating and assigning label materials
+
+        # - unpack the json dict containing label info
+        # - assemble shaders and plug in textures
+        # - render
+
         print("--JSON ")
-        json_data = json.loads(myjson)
-        for key, value in json_data.items():
-            print("> {} : {}".format(key, value))
-
-        print("------ ")
-
-        print("--Rendering with settings----")
-        print("image_destination: {}".format(image_destination))
-        print("file_url: {}".format(file_url))
-        print("image_height: {}".format(image_height))
-        print("image_width: {}".format(image_width))
-        print("horizontal_offset: {}".format(horizontal_offset))
-        print("vertical_offset: {}".format(vertical_offset))
-        print("scale: {}".format(scale))
+        json_data = json.loads(label_info)
 
         print("Copying base scene file")
         now = datetime.datetime.now()
         time_insert = now.strftime("%c").replace(" ", "_").replace(":","_")
 
-        source_scenefile = "C:\\Users\\siobh\\unbiased-structure\\packshot_configurator\\media\\pump_bottle_experiment_with_label_placement_script_experiments_base.blend"
+        #TODO: get this from django at the kick off point
+        source_scenefile = "C:\\Users\\siobh\\unbiased-structure\\packshot_configurator\\media\\pump_bottle_multiple_labels_base.blend"
         source_scenefile_bits = os.path.splitext(source_scenefile)
 
         destination_scenefile = time_insert.join(source_scenefile_bits)
@@ -38,21 +62,60 @@ def blender_render(image_destination, file_url, image_height, image_width, horiz
         #open the newly copied scene
         bpy.ops.wm.open_mainfile(filepath=destination_scenefile)
 
-        #set the label texture to the uploaded image
-        bpy.data.materials["Material.007"].node_tree.nodes["Image Texture.001"].image = bpy.data.images.load("C:/Users/siobh/unbiased-structure/packshot_configurator/{}".format(file_url))
+        label_index = 0
+        for label_info in json_data:
+            for key, value in label_info.items():
+                print("> {} : {}".format(key, value))
 
-        #Set the initial x scale of the image 
-        x_scale = image_width/ image_height
-        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[3].default_value[0] = x_scale
+            #retrieve values passed through from babylon preview
+            file_url = label_info["file_url"]
+            image_width = label_info["image_width"]
+            image_height = label_info["image_height"]
+            horizontal_offset = label_info["horizontal_offset"]
+            vertical_offset = label_info["vertical_offset"]
+            scale = label_info["scale"]
+            #create the material
+            label_material = bpy.data.materials.new("label_material")
+            label_material.use_nodes = True
 
-        #Set the offset position of the image
-        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[0] = (horizontal_offset/1024.0)
-        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[1].default_value[1] = (vertical_offset/1024.0)
+            #find the principled bsdf node
+            principled_bsdf = label_material.node_tree.nodes["Principled BSDF"]
 
-        #set the image scale
-        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[3].default_value[0] *= scale
-        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[3].default_value[1] *= scale
-        bpy.data.materials["Material.007"].node_tree.nodes["Mapping.001"].inputs[3].default_value[2] *= scale
+            #create image node network
+            image_tex = label_material.node_tree.nodes.new("ShaderNodeTexImage")
+            tex_coords = label_material.node_tree.nodes.new("ShaderNodeTexCoord")
+            tex_mapping = label_material.node_tree.nodes.new("ShaderNodeMapping")
+
+            #build connections
+            label_material.node_tree.links.new(tex_mapping.inputs['Vector'], tex_coords.outputs['UV'])
+            label_material.node_tree.links.new(image_tex.inputs['Vector'], tex_mapping.outputs['Vector'])
+            label_material.node_tree.links.new(principled_bsdf.inputs['Base Color'], image_tex.outputs['Color'])
+            label_material.node_tree.links.new(principled_bsdf.inputs['Alpha'], image_tex.outputs['Alpha'])
+
+            #assign image slot
+            print(">>>{}".format(file_url))
+            image_tex.image = bpy.data.images.load("C:/Users/siobh/unbiased-structure/packshot_configurator/{}".format(file_url))
+
+            #Calculate and set image scale
+            x_scale = float(image_width)/ float(image_height)
+            tex_mapping.inputs[3].default_value[0] = x_scale
+            #Set the offset position of the image
+            tex_mapping.inputs[1].default_value[0] = (float(horizontal_offset)/1024.0)
+            tex_mapping.inputs[1].default_value[1] = (float(vertical_offset)/1024.0)
+            #set the image scale
+            tex_mapping.inputs[3].default_value[0] *= float(scale)
+            tex_mapping.inputs[3].default_value[1] *= float(scale)
+            tex_mapping.inputs[3].default_value[2] *= float(scale)
+
+            print(">> finished making the material")
+
+            #Assign material to mesh
+            label_mesh = bpy.data.objects["label{}".format(str(label_index))]
+            print(label_mesh)
+            label_mesh.data.materials.append(label_material)
+            label_mesh.active_material_index = len(label_mesh.data.materials)-1
+
+            label_index = label_index + 1
 
         bpy.context.scene.render.filepath = image_destination  # Update this path
 
@@ -62,6 +125,7 @@ def blender_render(image_destination, file_url, image_height, image_width, horiz
 
         bpy.ops.wm.save_mainfile()
         bpy.ops.render.render(write_still=True)
+        
     
     except Exception as e:
         print(e)
@@ -70,17 +134,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("image_destination", type=str)
-    parser.add_argument("file_url", type=str)
-    parser.add_argument("image_height", type=float)
-    parser.add_argument("image_width", type=float)
-    parser.add_argument("horizontal_offset", type=float)
-    parser.add_argument("vertical_offset", type=float)
-    parser.add_argument("scale", type=float)
-    parser.add_argument("myjson", type=str)
+    parser.add_argument("label_info", type=str)
 
     args = parser.parse_args()
     
-    blender_render(args.image_destination, args.file_url, args.image_height, args.image_width, args.horizontal_offset, args.vertical_offset, args.scale, args.myjson)
+    blender_render(args.image_destination, args.label_info)
 
 
 

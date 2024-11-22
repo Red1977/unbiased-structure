@@ -63,17 +63,15 @@
                     <br>
                     <form method="POST" action="render_result/{{product.product_name}}" enctype="multipart/form-data" >
                         {% csrf_token %}
-                        <input type="hidden" id=horizontal_offset name="horizontal_offset"/> 
-                        <input type="hidden" id=vertical_offset name="vertical_offset"/> 
-                        <input type="hidden" id=image_height name="image_height"/> 
-                        <input type="hidden" id=image_width name="image_width"/> 
-                        <input type="hidden" id=scale name="scale"/> 
-                        <input type="hidden" id=texture_name name="texture_name"/>
-                        <input type="hidden" id=texture_input name="texture_input"/> 
-                        <input type="hidden" id="myjson" name="myjson"/>
-                        <input type="hidden" id="json_texture_settings" name="json_texture_settings"/>
+                        <input type="hidden" id="num_labels" name="num_labels" value="{{ num_labels|length }}" />
                         {% for i in num_labels %}
-                        <input type="text" id="label{{ forloop.counter }}" name="label{{ forloop.counter }}" value="{{ forloop.counter }}"/>
+                        <input type="hidden" id="horizontal_offset{{ forloop.counter0 }}" name="horizontal_offset{{ forloop.counter0 }}"/> 
+                        <input type="hidden" id="vertical_offset{{ forloop.counter0 }}" name="vertical_offset{{ forloop.counter0 }}"/> 
+                        <input type="hidden" id="image_height{{ forloop.counter0 }}" name="image_height{{ forloop.counter0 }}"/> 
+                        <input type="hidden" id="image_width{{ forloop.counter0 }}" name="image_width{{ forloop.counter0 }}"/> 
+                        <input type="hidden" id="scale{{ forloop.counter0 }}" name="scale{{ forloop.counter0 }}"/> 
+                        <input type="hidden" id="texture_name{{ forloop.counter0 }}" name="texture_name{{ forloop.counter0 }}"/>
+                        <input type="hidden" id="texture_input{{ forloop.counter0 }}" name="texture_input{{ forloop.counter0 }}"/> 
                         {% endfor %}
                         <input type="submit" value="Render Image"/>
                     </form>

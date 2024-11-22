@@ -9,6 +9,7 @@ import datetime
 import subprocess
 import io
 import base64
+import json
 
 # Create your views here.
 
@@ -26,29 +27,10 @@ def product( request, id):
   product = Product.objects.get(id=id)
   template = loader.get_template("individual_product.html")
 
-  context = {}
-
-  if request.method == 'POST':
-    form = UploadFileForm(request.POST, request.FILES)
-    if form.is_valid():
-      file = request.FILES['file']
-      fs = FileSystemStorage()
-      filename = fs.save(file.name, file)
-      file_url = fs.url(filename)
-      context = {
-        'product': product,
-        'form': form,
-        'file_url': file_url
-      }
-      
-  else:
-    form = UploadFileForm()
-
-    context = {
-      'product': product,
-      'num_labels' : range(product.num_labels),
-      'form': form
-    }
+  context = {
+    'product': product,
+    'num_labels' : range(product.num_labels)
+  }
 
   return HttpResponse(template.render(context, request))
 
@@ -56,42 +38,56 @@ def render(request,product_name):
 
   #TODO only render if input has changed - create a new context if it has
 
-  template = loader.get_template("render_result.html")
-
-  horizontal_offset = request.POST.get("horizontal_offset", "0.0")
-  vertical_offset = request.POST.get("vertical_offset", "0.0")
-  image_height = request.POST.get("image_height", "100.0")
-  image_width = request.POST.get("image_width", "100.0")
-  scale = request.POST.get("scale", "1.0")
-
   print(">>>>>>>>>>>>>> POST ")
   print(request.POST.keys())
   print("-----------------------")
-
-  myjson = request.POST.get("myjson", "")
-  print(">>>>>>>> json")
-  print(myjson)
-  print("-------------")
   
-  #TODO: error checking and early return to custom error page
-  filestr = request.POST.get("texture_input", "")
-  file_name = request.POST.get("texture_name", "")
-  byte_string = filestr.split(",")[1]
-  file = io.BytesIO(base64.urlsafe_b64decode(byte_string))
+  template = loader.get_template("render_result.html")
 
-  fs = FileSystemStorage()
-  filename = fs.save(file_name, file)
-  file_url = fs.url(filename)
+  #TODO:
+  # - retrieve num_labels from request
+  num_labels = request.POST.get("num_labels", "0")
 
-  print("file_url : {}".format(file_url))
-  
+  # - create list of dictionaries with label info
+  labels = []
+  print(num_labels)
+
+  for i in range(int(num_labels)):
+    #basic info
+    label_info = {
+      "horizontal_offset" : request.POST.get("horizontal_offset{}".format(i), "0.0"),
+      "vertical_offset" : request.POST.get("vertical_offset{}".format(i), "0.0"),
+      "image_height" : request.POST.get("image_height{}".format(i), "100.0"),
+      "image_width" : request.POST.get("image_width{}".format(i), "100.0"),
+      "scale" : request.POST.get("scale{}".format(i), "1.0")
+    }
+    #Texture upload
+    # get the bytestring representation of the image 
+    filestr = request.POST.get("texture_input{}".format(i), "")
+    file_name = request.POST.get("texture_name{}".format(i), "")
+
+    if "," in filestr:  
+      byte_string = filestr.split(",")[1]
+      file = io.BytesIO(base64.urlsafe_b64decode(byte_string))
+      # upload the image, storing the resulting URL to pass through
+      # to the render
+      fs = FileSystemStorage()
+      label_info["filename"] = fs.save(file_name, file)
+      label_info["file_url"] = fs.url(label_info["filename"])
+
+    labels.append(label_info)
+
+  # - pass through to render
+  #TODO: error checking (e.g. missing info) and early return to custom error page
+  #-------
   print("rendering: {}".format(product_name))
+  print("JSON info going to render: {}".format(json.dumps(labels)))
 
   now = datetime.datetime.now()
   image_suffix = "/renders/render_{}.png".format(str(datetime.datetime.timestamp(now)))
   image_destination = "{}{}".format((settings.MEDIA_ROOT), image_suffix)
   image_suffix_result = "/media/{}".format(image_suffix)
-  subprocess.run(["python", "blender_render.py", image_destination, file_url, image_height, image_width, horizontal_offset, vertical_offset, scale, myjson])
+  subprocess.run(["python", "blender_render.py", image_destination, json.dumps(labels)])
   
   print("finished rendering")
 
