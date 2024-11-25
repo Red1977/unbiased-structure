@@ -84,7 +84,16 @@ def blender_render(image_destination, label_info):
             #create image node network
             image_tex = label_material.node_tree.nodes.new("ShaderNodeTexImage")
             tex_coords = label_material.node_tree.nodes.new("ShaderNodeTexCoord")
-            tex_mapping = label_material.node_tree.nodes.new("ShaderNodeMapping")
+            tex_mapping = label_material.node_tree.nodes.new("ShaderNodeMapping") 
+
+            #node settings
+            image_tex.extension = 'CLIP'
+            tex_mapping.vector_type = 'TEXTURE'
+
+            # arrange graph nicely
+            tex_coords.location = (-1000,150)
+            tex_mapping.location = (-750,150)
+            image_tex.location = (-250,150)
 
             #build connections
             label_material.node_tree.links.new(tex_mapping.inputs['Vector'], tex_coords.outputs['UV'])
@@ -114,6 +123,10 @@ def blender_render(image_destination, label_info):
             print(label_mesh)
             label_mesh.data.materials.append(label_material)
             label_mesh.active_material_index = len(label_mesh.data.materials)-1
+
+            #Switch of transmission on the label mesh to prevent shadowing onto inside of glass etc
+            label_mesh.visible_transmission = False
+
 
             label_index = label_index + 1
 

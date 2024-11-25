@@ -131,7 +131,7 @@ class LabelMesh{
     }
 
     highlight(){
-        if (!this.container.isVisible && !this.texture_uploaded){
+        if (!this.texture_uploaded){
             this.highlight_layer.addMesh(this.mesh, BABYLON.Color3.Teal()); 
         }
     }
@@ -273,8 +273,8 @@ class LabelMesh{
     }
     
     register_callbacks(){
-        //this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, this.highlight ));
-        //this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, this.remove_highlight));
+        this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOverTrigger, this.highlight ));
+        this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPointerOutTrigger, this.remove_highlight));
         //this.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, this.set_active_mesh));
     }
 }
@@ -327,7 +327,7 @@ var createScene = function () {
                 label_meshes[i].isLabel = true;
             }
 
-            scene.onPointerObservable.add((pointerInfo) => {      		
+            scene.onPointerObservable.add((pointerInfo) => {   
                 switch (pointerInfo.type) {
                     case BABYLON.PointerEventTypes.POINTERDOWN:
                         if(pointerInfo.pickInfo.hit) {
