@@ -318,14 +318,17 @@ var createScene = function () {
             var label_meshes = [];
 
             console.log("Num Labels: " + num_labels.value);
+            console.log(container);
 
             for (let i = 0; i < num_labels.value; i++) {
-                label_meshes.push( scene.getMeshByName("Label") ); //TODO: adjust scene to name Labels with number suffix
+                label_meshes.push( scene.getMeshByName("label"+i)); //TODO: adjust scene to name Labels with number suffix
                 var label = new LabelMesh(label_meshes[i], 1024, 1024, scene, i);
                 labels.push(label);
                 label_meshes[i].label_object = label;
                 label_meshes[i].isLabel = true;
             }
+
+            console.log("label meshes retrieved");
 
             scene.onPointerObservable.add((pointerInfo) => {   
                 switch (pointerInfo.type) {
