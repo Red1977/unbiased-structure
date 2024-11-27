@@ -100,12 +100,19 @@ class LabelMesh{
         mesh.isPickable = true;
         all_meshes.push(this);
         this.mesh = mesh;
+        
         this.mesh.material = new BABYLON.PBRMaterial("pbr", scene);
         this.mesh.material.roughness = 1.0;
         this.actionManager = new BABYLON.ActionManager(scene);
         this.target_texture = new BABYLON.DynamicTexture(mesh.name+" dynamic texture",{ width: DTWidth, height: DTHeight } , scene);
         this.target_texture.hasAlpha = true;
         this.target_texture.updateSamplingMode(BABYLON.Constants.TEXTURE_TRILINEAR_SAMPLINGMODE);
+        this.texture_context = this.target_texture.getContext();
+
+        this.mesh.material.albedoTexture = new BABYLON.Texture(server + "/assets/label_start_texture.png", scene);
+        this.mesh.material.albedoTexture.hasAlpha = true;
+        this.mesh.material.useAlphaFromAlbedoTexture = true;
+        
         this.highlight_layer = new BABYLON.HighlightLayer(mesh.name, scene);
         this.mesh.actionManager = this.actionManager;
         this.register_callbacks = this.register_callbacks.bind(this);
