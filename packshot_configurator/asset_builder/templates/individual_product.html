@@ -43,6 +43,7 @@
     </head>
 
    <body>
+    {% include "navbar.html" %}
     <h1 >{{product.product_name}}</h1>
 
     <table  class="centre">
@@ -75,6 +76,11 @@
                         {% endfor %}
                         <input type="submit" value="Render Image"/>
                     </form>
+                    <form method="POST" action="save_result/{{product.product_name}}" enctype="multipart/form-data" >
+                        <input type="hidden" id="screenshot" name="screenshot"/>
+                        <input type="hidden" id="thumbnail" name="thumbnail"/>
+                        <input type="submit" value="Save Product Setup"/>
+                    </form>
                 </div>
             </td>
         </tr>
@@ -86,7 +92,7 @@
                                     data-background_image="{{ product.background_image }}"
                                     >
     </script>
-    
+    {% include "footer.html" %}
    </body>
 
 </html>
