@@ -52,7 +52,7 @@ def blender_render(image_destination, label_info):
         time_insert = now.strftime("%c").replace(" ", "_").replace(":","_")
 
         #TODO: get this from django at the kick off point
-        source_scenefile = "C:\\Users\\siobh\\unbiased-structure\\packshot_configurator\\media\\pump_bottle_multiple_labels_base.blend"
+        source_scenefile = "/home/siobhan/dev/media/pump_bottle_multiple_labels_base.blend"
         source_scenefile_bits = os.path.splitext(source_scenefile)
 
         destination_scenefile = time_insert.join(source_scenefile_bits)
@@ -103,7 +103,7 @@ def blender_render(image_destination, label_info):
 
             #assign image slot
             print(">>>{}".format(file_url))
-            image_tex.image = bpy.data.images.load("C:/Users/siobh/unbiased-structure/packshot_configurator/{}".format(file_url))
+            image_tex.image = bpy.data.images.load("/home/siobhan/dev/unbiased-structure/packshot_configurator/{}".format(file_url))
 
             #Calculate and set image scale
             x_scale = float(image_width)/ float(image_height)
