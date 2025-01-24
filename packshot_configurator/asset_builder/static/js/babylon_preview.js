@@ -78,7 +78,8 @@ class BackgroundMesh{
 
     take_screenshot(){
         //TODO: name and size to be derived from input
-        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, this.camera, {width: 2048, height: 2048, precision: 4},undefined, undefined,64,true,"my2k64PxScreenshot.png");
+        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, this.camera, {width: 2048, height: 2048, precision: 4},
+            undefined, undefined,4,true,"my2k64PxScreenshot.png" );
     }
 
     register_callbacks(){
