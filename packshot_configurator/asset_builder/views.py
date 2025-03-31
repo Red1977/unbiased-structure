@@ -15,6 +15,9 @@ import json
 
 #Product thumbnail list
 def products( request ):
+  """
+    Retrieve list of available products to configure
+  """
   products = Product.objects.all().values()
   template = loader.get_template('all_products.html')
   context = {
@@ -23,6 +26,9 @@ def products( request ):
   return HttpResponse(template.render(context, request))
 
 def product( request, id):
+  """
+    Retrieve selected product for configuration
+  """
   print("product view called")
   product = Product.objects.get(id=id)
   template = loader.get_template("individual_product.html")
@@ -35,6 +41,9 @@ def product( request, id):
   return HttpResponse(template.render(context, request))
 
 def render(request,product_name):
+  """
+    Pass through scene and configuration information to perform a Blender render on the server side
+  """
 
   #TODO only render if input has changed - create a new context if it has
 
@@ -87,6 +96,8 @@ def render(request,product_name):
   image_suffix = "/renders/render_{}.png".format(str(datetime.datetime.timestamp(now)))
   image_destination = "{}{}".format((settings.MEDIA_ROOT), image_suffix)
   image_suffix_result = "/media/{}".format(image_suffix)
+
+  #TODO: replace with celery task to avoid blocking the web app
   subprocess.run(["python", "blender_render.py", image_destination, json.dumps(labels)])
   
   print("finished rendering")

@@ -1,21 +1,20 @@
 
-//"https://red1977.github.io/urban-octo-robot/"
+//------------------------------------------------------------------------------------------------
+// Preview label placement over packshot image.
 //
-//server+"/assets/", "pump_bottle_for_babylon_rear_proj_v03.glb"
-//
-//docs/assets/pump_bottle_render_layers_beauty.png
+//  - The product image is projected onto a background plane 
+//  - 3D label geometry is aligned in the scene to appear over the product image
+//  - The user can upload a label texture from their local computer and adjust the image placement
+//  using mouse click and drag.  The texture can be scaled using a mouse wheel zoom.
+//  - Once the user is happy with their texture placement, they can take a screenshot of the image
+//  or request a Blender render of the full scene.
+//------------------------------------------------------------------------------------------------
 
 
+// Gather DOM elements to communicate with the HTML 
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 const sayhello_button = document.getElementById("sayhello_button");
 const screenshot = document.getElementById("screenshot");
-//var horizontal_offset = document.getElementById("horizontal_offset");
-//var vertical_offset = document.getElementById("vertical_offset");
-//var scale = document.getElementById("scale");
-//var texture_input = document.getElementById("texture_input");
-//var texture_name = document.getElementById("texture_name");
-//var image_height = document.getElementById("image_height");
-//var image_width = document.getElementById("image_width");
 
 var num_labels = document.getElementById("num_labels");
 
@@ -39,7 +38,8 @@ for (let i = 0; i < num_labels.value; i++) {
 
 }
 
-const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+// Set up the BabylonJS scene 
+const engine = new BABYLON.Engine(canvas, true); 
 var active_mesh = {};
 var all_meshes = [];
 let server = "https://red1977.github.io/urban-octo-robot/";
@@ -50,6 +50,10 @@ const glb_path = data.path_to_glb;
 const texture_path = data.texture_image;
 
 class BackgroundMesh{
+    //---------------------------------------------------
+    // The Background mesh has the product image projected onto it
+    // It also acts as a container to bind user actions (e.g. screenshot)
+    //---------------------------------------------------
     constructor(mesh, scene){
         this.bg_material = new BABYLON.BackgroundMaterial("myMaterial", scene);
         this.bg_material.diffuseTexture = new BABYLON.Texture(server+'/assets/'+background_image, scene);
@@ -88,6 +92,12 @@ class BackgroundMesh{
 }
 
 class LabelMesh{
+    //---------------------------------------------------
+    // Label mesh objects are instantiated for each object named 'label<n>' exported from the original Blender scene
+    // When a user's mouse hovers over a label, a highlight effect indicates it can be customised by uploading a label
+    // texture.
+    // Label position data maps the canvas coordinates to 3D UVs for later use by Blender
+    //---------------------------------------------------
     constructor(mesh, DTWidth, DTHeight, scene, label_num){
         this.label_num = label_num;
         this.canvas_width = DTWidth;
@@ -228,8 +238,6 @@ class LabelMesh{
 
     update_texture(){        
 
-        //TODO: Also need to apply offset scaling to horizontal offset for Blender
-
         var textureContext = this.target_texture.getContext();
         textureContext.clearRect(0,0,this.canvas_width, this.canvas_height);
 
@@ -289,6 +297,14 @@ class LabelMesh{
 
 
 var createScene = function () {
+    //----------------------------------------------------------------------------------
+    // Scene creation sets up the scene in several stages
+    // - Creates base scene and camera objects
+    // - Loads the .glb file associated with this product configuration which will contain a background plane
+    //   aligned with the camera and a number of 'label' meshes
+    // - A mouse tracking observable is set up to monitor the user's mouse movements for image placement
+    //   and action requests 
+    //----------------------------------------------------------------------------------
     var scene = new BABYLON.Scene(engine);
     var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI/2, Math.PI / 3, 25, BABYLON.Vector3.Zero(), scene);
 	camera.attachControl(canvas, true);
@@ -299,6 +315,7 @@ var createScene = function () {
     console.log("glb_path:");
     console.log(glb_path);
 
+    //TODO: Switch to async version of this method
     const container = BABYLON.SceneLoader.LoadAssetContainer(server + "/assets/" , glb_path, scene, function (container) {
 
             container.addAllToScene();
